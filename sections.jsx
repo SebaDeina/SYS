@@ -120,7 +120,7 @@ function Hero() {
 
         <h1 className="hero-title">
           <span className="ln"><span className="word" style={{animationDelay:"0.05s"}}><T es="Más que agencia," en="More than an agency," /></span></span>
-          <span className="ln"><span className="word" style={{animationDelay:"0.20s"}}><T es="tu " en="your " /></span><em className="word" style={{animationDelay:"0.32s"}}><T es="aliado" en="strategic" /></em><span className="word" style={{animationDelay:"0.44s"}}><T es=" digital." en=" ally." /></span></span>
+          <span className="ln"><span className="word" style={{animationDelay:"0.20s"}}><T es="tu" en="your" /></span>{" "}<em className="word" style={{animationDelay:"0.32s"}}><T es="aliado" en="strategic" /></em>{" "}<span className="word" style={{animationDelay:"0.44s"}}><T es="digital." en="ally." /></span></span>
         </h1>
 
         <Reveal as="div" delay={3}>
