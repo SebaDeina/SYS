@@ -36,9 +36,8 @@ function Nav() {
 
   return (
     <nav className={`nav ${onCyan ? "on-cyan" : ""}`}>
-      <a className="nav-brand" href="#top">
+      <a className="nav-brand nav-brand--logo-only" href="#top" aria-label="Sys Digital">
         <span className="lg"><Logo /></span>
-        <span>Sys Digital<span className="dot" /></span>
       </a>
       <div className="nav-links">
         {links.map((l) => (
@@ -308,15 +307,15 @@ function Portfolio() {
   return (
     <section id="work" className="portfolio-section">
       <div className="container">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 24, marginBottom: 64 }}>
+        <div className="portfolio-header">
           <div>
             <Reveal as="div" className="section-tag">
               <T es="Portfolio" en="Selected work" />
             </Reveal>
             <Reveal as="h2" className="section-title" delay={1} style={{ marginBottom: 0 }}>
               <T
-                es={<>Trabajos que <em>mueven aguja.</em></>}
-                en={<>Work that <em>moved the needle.</em></>}
+                es={<>Proyectos con <em>resultados reales.</em></>}
+                en={<>Projects with <em>real results.</em></>}
               />
             </Reveal>
           </div>
@@ -561,7 +560,7 @@ function Footer() {
           <div className="footer-brand">
             <a className="nav-brand" href="#top">
               <span className="lg" style={{ width: 36, height: 22, color: "#fff" }}><Logo /></span>
-              <span>Sys Digital<span className="dot" /></span>
+              <span className="nav-brand-name">Sys&nbsp;Digital<span className="dot" /></span>
             </a>
             <p className="tag">
               <T es="Tu aliado estratégico para diseñar, automatizar y escalar lo digital."
