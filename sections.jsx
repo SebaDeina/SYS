@@ -38,6 +38,7 @@ function Nav() {
     <nav className={`nav ${onCyan ? "on-cyan" : ""}`}>
       <a className="nav-brand nav-brand--logo-only" href="#top" aria-label="Sys Digital">
         <span className="lg"><Logo /></span>
+        <span className="nav-brand-name">Sys&nbsp;Digital<span className="dot" /></span>
       </a>
       <div className="nav-links">
         {links.map((l) => (
@@ -59,25 +60,75 @@ function Nav() {
 
 /* ----------------- HERO ----------------- */
 
-function HeroDecor() {
-  // Code snippets + shapes scattered across the hero
+function useHeroParallax(heroRef) {
+  const [offset, setOffset] = _useState({ x: 0, y: 0 });
+  const [enabled, setEnabled] = _useState(false);
+
+  _useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const canInteract = () =>
+      window.matchMedia("(hover: hover) and (min-width: 901px)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const sync = () => setEnabled(canInteract());
+    sync();
+
+    const mqHover = window.matchMedia("(hover: hover) and (min-width: 901px)");
+    const mqMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    mqHover.addEventListener("change", sync);
+    mqMotion.addEventListener("change", sync);
+
+    const onMove = (e) => {
+      if (!canInteract()) return;
+      const r = hero.getBoundingClientRect();
+      setOffset({
+        x: ((e.clientX - r.left) / r.width - 0.5) * 2,
+        y: ((e.clientY - r.top) / r.height - 0.5) * 2,
+      });
+    };
+    const onLeave = () => setOffset({ x: 0, y: 0 });
+
+    hero.addEventListener("mousemove", onMove);
+    hero.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      mqHover.removeEventListener("change", sync);
+      mqMotion.removeEventListener("change", sync);
+      hero.removeEventListener("mousemove", onMove);
+      hero.removeEventListener("mouseleave", onLeave);
+    };
+  }, [heroRef]);
+
+  return { offset, enabled };
+}
+
+function heroParallaxStyle(depth, offset, enabled) {
+  if (!enabled) return undefined;
+  return {
+    transform: `translate(${offset.x * depth * 18}px, ${offset.y * depth * 14}px)`,
+  };
+}
+
+function HeroDecor({ offset, enabled }) {
   const codeSnippets = [
-    { cls: "f-1", txt: "</>", },
-    { cls: "f-4", txt: "npm i" },
-    { cls: "f-5", txt: "const" },
-    { cls: "f-9", txt: "return" },
-    { cls: "f-12", txt: "async" },
+    { cls: "f-1", txt: "</>", depth: 1.15 },
+    { cls: "f-4", txt: "npm i", depth: 0.85 },
+    { cls: "f-5", txt: "const", depth: 1.05 },
+    { cls: "f-9", txt: "return", depth: 0.75 },
+    { cls: "f-12", txt: "async", depth: 0.95 },
   ];
   const shapes = [
-    { cls: "f-2", shape: "circle" },
-    { cls: "f-3", shape: "hash" },
-    { cls: "f-6", shape: "triangle" },
-    { cls: "f-7", shape: "plus" },
-    { cls: "f-8", shape: "diamond" },
-    { cls: "f-10", shape: "hexagon" },
-    { cls: "f-11", shape: "square" },
-    { cls: "f-13", shape: "play" },
-    { cls: "f-14", shape: "pen" },
+    { cls: "f-2", shape: "circle", depth: 1.2 },
+    { cls: "f-3", shape: "hash", depth: 0.9 },
+    { cls: "f-6", shape: "triangle", depth: 1.1 },
+    { cls: "f-7", shape: "plus", depth: 0.8 },
+    { cls: "f-8", shape: "diamond", depth: 1.25 },
+    { cls: "f-10", shape: "hexagon", depth: 0.7 },
+    { cls: "f-11", shape: "square", depth: 1.0 },
+    { cls: "f-13", shape: "play", depth: 0.65 },
+    { cls: "f-14", shape: "pen", depth: 1.15 },
   ];
 
   const Shape = ({ kind }) => {
@@ -96,24 +147,43 @@ function HeroDecor() {
   };
 
   return (
-    <div className="hero-decor" aria-hidden="true">
-      {codeSnippets.map((c, i) => <div key={"c"+i} className={`fl ${c.cls}`}>{c.txt}</div>)}
-      {shapes.map((s, i) => <div key={"s"+i} className={`fl ${s.cls}`}><Shape kind={s.shape} /></div>)}
+    <div className={`hero-decor${enabled ? " hero-decor--interactive" : ""}`} aria-hidden="true">
+      {codeSnippets.map((c, i) => (
+        <div
+          key={"c" + i}
+          className={`fl-parallax ${c.cls}`}
+          style={heroParallaxStyle(c.depth, offset, enabled)}
+        >
+          <div className="fl">{c.txt}</div>
+        </div>
+      ))}
+      {shapes.map((s, i) => (
+        <div
+          key={"s" + i}
+          className={`fl-parallax ${s.cls}`}
+          style={heroParallaxStyle(s.depth, offset, enabled)}
+        >
+          <div className="fl"><Shape kind={s.shape} /></div>
+        </div>
+      ))}
     </div>
   );
 }
 
 function Hero() {
+  const heroRef = _useRef(null);
+  const { offset, enabled } = useHeroParallax(heroRef);
+
   return (
-    <section className="hero" id="top">
+    <section ref={heroRef} className="hero" id="top">
       <div className="hero-watermark" aria-hidden="true"><Logo /></div>
-      <HeroDecor />
+      <HeroDecor offset={offset} enabled={enabled} />
 
       <div className="container hero-inner">
         <Reveal as="div">
           <div className="hero-eyebrow">
             <span className="pulse" />
-            <T es="Agencia de Marketing & Automatizaciones" en="Marketing & Automation Studio" />
+            <T es="Marketing, automatización e IA" en="Marketing, automation & AI" />
           </div>
         </Reveal>
 
@@ -521,8 +591,8 @@ function Contact() {
               </a>
 
               <a className="channel" href="https://wa.me/" target="_blank" rel="noreferrer">
-                <div className="channel-icon">
-                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 11-3.4-6.8L21 4l-1.3 3.4A8.4 8.4 0 0121 11.5z"/><path d="M8 10c0 3 2 5 5 5l1-1.5-2-1-1 .5c-1 0-2-1-2-2l.5-1-1-2L8 10z"/></svg>
+                <div className="channel-icon channel-icon--wa">
+                  <WhatsAppIcon />
                 </div>
                 <div className="channel-text">
                   <div className="channel-label">WhatsApp</div>
@@ -609,9 +679,7 @@ function Footer() {
 function WhatsAppFloat() {
   return (
     <a href="https://wa.me/" target="_blank" rel="noreferrer" className="wa-float" aria-label="WhatsApp">
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M16 3C9.4 3 4 8.4 4 15c0 2.4.7 4.6 1.9 6.5L4 29l7.7-2c1.8 1 3.9 1.6 6.3 1.6 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-2 0-3.9-.6-5.5-1.5l-.4-.2-4 1 1-3.9-.3-.4C5.7 18.7 5.2 16.9 5.2 15c0-6 4.8-10.8 10.8-10.8s10.8 4.8 10.8 10.8-4.8 10.6-10.8 10.6zm6.3-8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-2-1.8-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4 0-.7.3-.2.3-.9.9-.9 2.2 0 1.3 1 2.6 1.1 2.7.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.5-.4z"/>
-      </svg>
+      <WhatsAppIcon />
     </a>
   );
 }

@@ -204,9 +204,25 @@ section { position: relative; padding: 80px 0; z-index: 2; }
   color: var(--cyan-deep);
   justify-self: start;
 }
+.nav-brand--logo-only .nav-brand-name {
+  display: none;
+}
 .nav-brand--logo-only .lg {
   width: 44px;
   height: 28px;
+}
+@media (min-width: 901px) {
+  .nav-brand--logo-only {
+    gap: 10px;
+  }
+  .nav-brand--logo-only .nav-brand-name {
+    display: inline;
+    color: var(--fg);
+  }
+  .nav-brand--logo-only .lg {
+    width: 36px;
+    height: 22px;
+  }
 }
 .nav-brand .lg svg { width: 100%; height: 100%; fill: currentColor; }
 .nav-brand .dot {
@@ -449,8 +465,15 @@ section { position: relative; padding: 80px 0; z-index: 2; }
   z-index: 2;
   overflow: hidden;
 }
-.fl {
+.fl-parallax {
   position: absolute;
+  will-change: transform;
+}
+.hero-decor--interactive .fl-parallax {
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fl {
+  position: relative;
   color: rgba(10, 22, 40, 0.42);
   font-family: var(--font-mono);
   font-size: 14px;
@@ -462,20 +485,34 @@ section { position: relative; padding: 80px 0; z-index: 2; }
   .fl { color: rgba(10, 22, 40, 0.35); }
   .fl svg { stroke: rgba(10, 22, 40, 0.35); }
 }
-.fl.f-1 { top: 12%; left: 8%; }
-.fl.f-2 { top: 18%; left: 38%; animation-delay: -2s; }
-.fl.f-3 { top: 22%; right: 30%; animation-delay: -4s; }
-.fl.f-4 { top: 8%; right: 18%; animation-delay: -1s; font-size: 13px; }
-.fl.f-5 { top: 55%; left: 4%; animation-delay: -3s; }
-.fl.f-6 { top: 40%; left: 30%; animation-delay: -5s; }
-.fl.f-7 { top: 60%; right: 26%; animation-delay: -2.5s; }
-.fl.f-8 { bottom: 22%; left: 14%; animation-delay: -6s; }
-.fl.f-9 { bottom: 28%; right: 12%; animation-delay: -3.5s; font-size: 13px; }
-.fl.f-10 { bottom: 12%; left: 42%; animation-delay: -1.5s; }
-.fl.f-11 { top: 30%; right: 6%; animation-delay: -4.5s; }
-.fl.f-12 { top: 70%; left: 48%; animation-delay: -5.5s; font-size: 13px; }
-.fl.f-13 { top: 14%; right: 42%; animation-delay: -0.8s; }
-.fl.f-14 { bottom: 38%; right: 38%; animation-delay: -2.8s; }
+.fl-parallax.f-1 { top: 12%; left: 8%; }
+.fl-parallax.f-2 { top: 18%; left: 38%; }
+.fl-parallax.f-2 .fl { animation-delay: -2s; }
+.fl-parallax.f-3 { top: 22%; right: 30%; }
+.fl-parallax.f-3 .fl { animation-delay: -4s; }
+.fl-parallax.f-4 { top: 8%; right: 18%; }
+.fl-parallax.f-4 .fl { animation-delay: -1s; font-size: 13px; }
+.fl-parallax.f-5 { top: 55%; left: 4%; }
+.fl-parallax.f-5 .fl { animation-delay: -3s; }
+.fl-parallax.f-6 { top: 40%; left: 30%; }
+.fl-parallax.f-6 .fl { animation-delay: -5s; }
+.fl-parallax.f-7 { top: 60%; right: 26%; }
+.fl-parallax.f-7 .fl { animation-delay: -2.5s; }
+.fl-parallax.f-8 { bottom: 22%; left: 14%; }
+.fl-parallax.f-8 .fl { animation-delay: -6s; }
+.fl-parallax.f-9 { bottom: 28%; right: 12%; }
+.fl-parallax.f-9 .fl { animation-delay: -3.5s; }
+.fl-parallax.f-9 .fl { font-size: 13px; }
+.fl-parallax.f-10 { bottom: 12%; left: 42%; }
+.fl-parallax.f-10 .fl { animation-delay: -1.5s; }
+.fl-parallax.f-11 { top: 30%; right: 6%; }
+.fl-parallax.f-11 .fl { animation-delay: -4.5s; }
+.fl-parallax.f-12 { top: 70%; left: 48%; }
+.fl-parallax.f-12 .fl { animation-delay: -5.5s; font-size: 13px; }
+.fl-parallax.f-13 { top: 14%; right: 42%; }
+.fl-parallax.f-13 .fl { animation-delay: -0.8s; }
+.fl-parallax.f-14 { bottom: 38%; right: 38%; }
+.fl-parallax.f-14 .fl { animation-delay: -2.8s; }
 
 @keyframes floatY {
   0%, 100% { transform: translateY(0) rotate(0); }
@@ -1357,6 +1394,12 @@ section { position: relative; padding: 80px 0; z-index: 2; }
   flex-shrink: 0;
 }
 .channel-icon svg { width: 20px; height: 20px; stroke: var(--cyan-bright); fill: none; stroke-width: 1.7; }
+.channel-icon--wa svg.wa-icon {
+  width: 22px;
+  height: 22px;
+  fill: var(--cyan-bright);
+  stroke: none;
+}
 .channel-text { flex: 1; min-width: 0; }
 .channel-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; }
 .channel-value { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; }
@@ -1374,7 +1417,7 @@ section { position: relative; padding: 80px 0; z-index: 2; }
 .footer-watermark {
   position: absolute;
   bottom: -30%;
-  right: -10%;
+  left: -10%;
   width: 60%;
   opacity: 0.06;
   pointer-events: none;
@@ -1481,7 +1524,12 @@ section { position: relative; padding: 80px 0; z-index: 2; }
   100% { transform: scale(1.35); opacity: 0; }
 }
 .wa-float:hover { transform: scale(1.08); }
-.wa-float svg { width: 28px; height: 28px; fill: #fff; }
+.wa-float .wa-icon {
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  display: block;
+}
 
 @media (min-width: 769px) {
   .wa-float { bottom: 24px; right: 24px; width: 56px; height: 56px; }
