@@ -1,62 +1,9 @@
 /* =================================================================
    sections.jsx — Nav, Hero, Stats, Marquee, Services, Portfolio,
-   Testimonials, FAQ, Contact, Footer, WhatsApp floating
+   Testimonials, FAQ, HomeContactCTA, ContactPageBody, Footer, WhatsApp floating
 ================================================================= */
 
 const { useState: _useState, useEffect: _useEffect, useRef: _useRef } = React;
-
-/* ----------------- NAV ----------------- */
-
-function Nav() {
-  const [onCyan, setOnCyan] = _useState(true);
-  const { lang, setLang } = useLang();
-
-  _useEffect(() => {
-    const compute = () => {
-      const hero = document.querySelector(".hero");
-      if (!hero) return;
-      const heroBottom = hero.getBoundingClientRect().bottom;
-      setOnCyan(heroBottom > 84);
-    };
-    compute();
-    window.addEventListener("scroll", compute, { passive: true });
-    window.addEventListener("resize", compute);
-    return () => {
-      window.removeEventListener("scroll", compute);
-      window.removeEventListener("resize", compute);
-    };
-  }, []);
-
-  const links = [
-    { href: "#services", es: "Servicios", en: "Services" },
-    { href: "#work", es: "Casos", en: "Work" },
-    { href: "#testimonials", es: "Reseñas", en: "Voices" },
-    { href: "#faq", es: "FAQ", en: "FAQ" },
-  ];
-
-  return (
-    <nav className={`nav ${onCyan ? "on-cyan" : ""}`}>
-      <a className="nav-brand nav-brand--logo-only" href="#top" aria-label="Sys Digital">
-        <span className="lg"><Logo /></span>
-        <span className="nav-brand-name">Sys&nbsp;Digital<span className="dot" /></span>
-      </a>
-      <div className="nav-links">
-        {links.map((l) => (
-          <a key={l.href} href={l.href}>{lang === "en" ? l.en : l.es}</a>
-        ))}
-      </div>
-      <div className="nav-right">
-        <div className="lang-switch" role="group" aria-label="Language">
-          <button className={lang === "es" ? "active" : ""} onClick={() => setLang("es")}>ES</button>
-          <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>EN</button>
-        </div>
-        <a className="btn btn-ghost btn-sm" href="#contact">
-          <T es="Contactanos" en="Contact us" />
-        </a>
-      </div>
-    </nav>
-  );
-}
 
 /* ----------------- HERO ----------------- */
 
@@ -209,7 +156,7 @@ function Hero() {
             <T es="Ver servicios" en="Our services" />
             <span className="arr">→</span>
           </a>
-          <a href="#contact" className="btn btn-outline-white">
+          <a href={pageUrl("contacto.html")} className="btn btn-outline-white">
             <T es="Contactanos" en="Contact us" />
           </a>
         </Reveal>
@@ -278,6 +225,7 @@ function Stats() {
 
 const SERVICES = [
   {
+    slug: "automatizacion",
     num: "01",
     es: { title: "Automatizaciones, Data & IA",
           desc: "Conectamos sistemas, eliminamos trabajo manual y dejamos que la data tome decisiones por vos.",
@@ -288,17 +236,30 @@ const SERVICES = [
     icon: (<svg viewBox="0 0 24 24"><path d="M4 6h6M14 6h6M4 12h16M4 18h6M14 18h6M10 4v4M14 10v4M10 16v4"/></svg>),
   },
   {
+    slug: "diseno",
     num: "02",
     es: { title: "Diseño gráfico & multimedia",
           desc: "Identidad y piezas que se ven hechas con criterio. Lo visual también vende.",
-          items: ["Branding (logo, paleta, tipos)", "Contenido para redes", "Fotografía + retoque", "Ilustración, vectores, packaging", "Páginas web"] },
+          items: ["Branding (logo, paleta, tipos)", "Contenido para redes", "Fotografía + retoque", "Ilustración, vectores, packaging"] },
     en: { title: "Design & multimedia",
           desc: "Identity and assets built with intent. Visuals close the sale too.",
-          items: ["Full branding (logo, palette, type)", "Social-first content", "Photography + retouching", "Illustration, vectors, packaging", "Websites"] },
+          items: ["Full branding (logo, palette, type)", "Social-first content", "Photography + retouching", "Illustration, vectors, packaging"] },
     icon: (<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 14l5-5 5 5M14 11l3-3 4 4"/><circle cx="8" cy="8" r="1.5"/></svg>),
   },
   {
+    slug: "web",
     num: "03",
+    es: { title: "Páginas web",
+          desc: "Sitios rápidos, claros y pensados para convertir — no solo para verse bien.",
+          items: ["Landings de conversión", "Sitios institucionales", "E-commerce", "Web apps & mantenimiento"] },
+    en: { title: "Websites",
+          desc: "Fast, clear sites built to convert — not just to look good.",
+          items: ["Conversion landings", "Corporate sites", "E-commerce", "Web apps & maintenance"] },
+    icon: (<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20M8 4v4"/></svg>),
+  },
+  {
+    slug: "marketing",
+    num: "04",
     es: { title: "Marketing digital",
           desc: "Estrategia, performance y crecimiento medible. No es magia, es método.",
           items: ["Consultoría digital", "Estrategia en META y Google", "SEO / SEM", "Investigación de público objetivo"] },
@@ -308,7 +269,8 @@ const SERVICES = [
     icon: (<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>),
   },
   {
-    num: "04",
+    slug: "community",
+    num: "05",
     es: { title: "Community management",
           desc: "Tu marca viva en redes. Conversación real, contenido pensado y tendencias bien usadas.",
           items: ["Gestión de comunidad y mensajes", "Grabación + producción de contenido", "Ideación y nuevos formatos", "Investigación de tendencias"] },
@@ -329,8 +291,8 @@ function Services() {
         </Reveal>
         <Reveal as="h2" className="section-title" delay={1}>
           <T
-            es={<>Cuatro áreas, <em>un solo equipo trabajando para vos.</em></>}
-            en={<>Four areas, <em>one team working for you.</em></>}
+            es={<>Cinco áreas, <em>un solo equipo trabajando para vos.</em></>}
+            en={<>Five areas, <em>one team working for you.</em></>}
           />
         </Reveal>
         <Reveal as="p" className="section-lead" delay={2}>
@@ -344,13 +306,51 @@ function Services() {
           {SERVICES.map((s, i) => {
             const c = lang === "en" ? s.en : s.es;
             return (
-              <Reveal as="article" className="service-card" key={s.num} delay={(i % 2) + 1}>
-                <div className="service-icon">{s.icon}</div>
-                <div className="service-num">{s.num} / 04</div>
-                <h3 className="service-title">{c.title}</h3>
-                <p className="service-desc">{c.desc}</p>
-                <ul className="service-list">
-                  {c.items.map((it) => <li key={it}>{it}</li>)}
+              <Reveal as="div" className="service-card-wrap" key={s.slug} delay={(i % 2) + 1}>
+                <a className="service-card service-card--link" href={pageUrl(`servicios/${s.slug}.html`)}>
+                  <div className="service-icon">{s.icon}</div>
+                  <div className="service-num">{s.num} / 05</div>
+                  <h3 className="service-title">{c.title}</h3>
+                  <p className="service-desc">{c.desc}</p>
+                  <ul className="service-list">
+                    {c.items.map((it) => <li key={it}>{it}</li>)}
+                  </ul>
+                  <span className="service-more">
+                    <T es="Ver servicio" en="View service" />
+                    <span className="arr">→</span>
+                  </span>
+                </a>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------- TEAM ----------------- */
+
+function TeamSection() {
+  const { lang } = useLang();
+  return (
+    <section className="team-section">
+      <div className="container">
+        <Reveal as="div" className="section-tag">
+          <T es="Equipo" en="Team" />
+        </Reveal>
+        <Reveal as="h2" className="section-title" delay={1}>
+          <T es={<>Las personas detrás de <em>Sys Digital.</em></>} en={<>The people behind <em>Sys Digital.</em></>} />
+        </Reveal>
+        <div className="team-grid">
+          {TEAM_MEMBERS.map((member, i) => {
+            const m = lang === "en" ? member.en : member.es;
+            return (
+              <Reveal as="article" className="team-card" key={member.slug} delay={i + 1}>
+                <div className="team-avatar" aria-hidden="true">{member.initials}</div>
+                <h3 className="team-name">{m.name}</h3>
+                <ul className="team-roles">
+                  {m.roles.map((role) => <li key={role}>{role}</li>)}
                 </ul>
               </Reveal>
             );
@@ -361,19 +361,74 @@ function Services() {
   );
 }
 
-/* ----------------- PORTFOLIO ----------------- */
+/* ----------------- PORTFOLIO / CASOS ----------------- */
 
-const WORK = [
-  { cat: "Web & Branding", es: "E-commerce vinícola", en: "Wine e-commerce", grad: "gradient-1", span: "span-4" },
-  { cat: "Automation", es: "Pipeline de leads · n8n", en: "Lead pipeline · n8n", grad: "gradient-2", span: "span-2" },
-  { cat: "App", es: "App de gestión interna", en: "Internal ops app", grad: "gradient-6", span: "span-3" },
-  { cat: "Performance", es: "Meta Ads · D2C", en: "Meta Ads · D2C", grad: "gradient-4", span: "span-3" },
-  { cat: "Branding", es: "Rebrand SaaS", en: "SaaS rebrand", grad: "gradient-3", span: "span-2" },
-  { cat: "Community", es: "Cuenta lifestyle", en: "Lifestyle account", grad: "gradient-5", span: "span-4" },
-];
+function CasesGridFeatured() {
+  const { lang } = useLang();
+  const featured = FEATURED_CASE_SLUGS
+    .map((slug) => CASE_STUDIES.find((c) => c.slug === slug))
+    .filter(Boolean);
+
+  return (
+    <div className="portfolio-grid portfolio-grid--featured">
+      {featured.map((w, i) => {
+        const c = lang === "en" ? w.en : w.es;
+        const cat = lang === "en" ? w.cat.en : w.cat.es;
+        const span = FEATURED_CASE_SPANS[w.slug] || "span-3";
+        return (
+          <Reveal as="div" className="work-card-wrap" key={w.slug} delay={(i % 3) + 1}>
+            <a className={`work-card ${span}`} href={pageUrl(`casos/${w.slug}.html`)}>
+              <div className={`work-thumb ${w.grad}`}>
+                <div className="work-mock">[ {c.title} ]</div>
+              </div>
+              <div className="work-meta">
+                <div>
+                  <div className="work-cat">{cat}</div>
+                  <h3 className="work-title">{c.title}</h3>
+                </div>
+                <div className="work-arrow">
+                  <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                </div>
+              </div>
+            </a>
+          </Reveal>
+        );
+      })}
+    </div>
+  );
+}
+
+function CasesGridAll() {
+  const { lang } = useLang();
+  return (
+    <ul className="cases-list">
+      {CASE_STUDIES.map((w, i) => {
+        const c = lang === "en" ? w.en : w.es;
+        const cat = lang === "en" ? w.cat.en : w.cat.es;
+        return (
+          <Reveal as="li" key={w.slug} delay={(i % 2) + 1}>
+            <a className="case-list-card" href={pageUrl(`casos/${w.slug}.html`)}>
+              <div className={`case-list-visual ${w.grad}`} aria-hidden="true">
+                <span className="case-list-visual-label">{c.title}</span>
+              </div>
+              <div className="case-list-body">
+                <span className="case-list-cat">{cat}</span>
+                <h3 className="case-list-title">{c.title}</h3>
+                <p className="case-list-summary">{c.summary}</p>
+                <span className="case-list-cta">
+                  <T es="Ver caso" en="View case" />
+                  <span className="arr">→</span>
+                </span>
+              </div>
+            </a>
+          </Reveal>
+        );
+      })}
+    </ul>
+  );
+}
 
 function Portfolio() {
-  const { lang } = useLang();
   return (
     <section id="work" className="portfolio-section">
       <div className="container">
@@ -389,30 +444,12 @@ function Portfolio() {
               />
             </Reveal>
           </div>
-          <Reveal as="a" href="#contact" className="btn btn-ghost btn-sm" delay={2}>
-            <T es="Ver más casos" en="See more" />
+          <Reveal as="a" href={pageUrl("casos.html")} className="btn btn-ghost btn-sm" delay={2}>
+            <T es="Ver todos los casos" en="View all work" />
             <span className="arr">→</span>
           </Reveal>
         </div>
-
-        <div className="portfolio-grid">
-          {WORK.map((w, i) => (
-            <Reveal as="article" className={`work-card ${w.span}`} key={i} delay={(i % 3) + 1}>
-              <div className={`work-thumb ${w.grad}`}>
-                <div className="work-mock">[ {lang === "en" ? w.en : w.es} ]</div>
-              </div>
-              <div className="work-meta">
-                <div>
-                  <div className="work-cat">{w.cat}</div>
-                  <h3 className="work-title">{lang === "en" ? w.en : w.es}</h3>
-                </div>
-                <div className="work-arrow">
-                  <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <CasesGridFeatured />
       </div>
     </section>
   );
@@ -549,9 +586,160 @@ function FAQ() {
 
 /* ----------------- CONTACT ----------------- */
 
-function Contact() {
+function ContactChannels({ compact }) {
   return (
-    <section id="contact" className="contact-section">
+    <div className={`contact-channels${compact ? " contact-channels--compact" : ""}`}>
+      <a className="channel" href="https://wa.me/" target="_blank" rel="noreferrer">
+        <div className="channel-icon channel-icon--wa">
+          <WhatsAppIcon />
+        </div>
+        <div className="channel-text">
+          <div className="channel-label">WhatsApp</div>
+          <div className="channel-value"><T es="Escribinos ahora" en="Message us now" /></div>
+        </div>
+        <span className="channel-arr">→</span>
+      </a>
+      <a className="channel" href="mailto:hola@sysdigital.com">
+        <div className="channel-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+        </div>
+        <div className="channel-text">
+          <div className="channel-label">Email</div>
+          <div className="channel-value">hola@sysdigital.com</div>
+        </div>
+        <span className="channel-arr">→</span>
+      </a>
+      <a className="channel" href="#agenda" target="_blank" rel="noreferrer">
+        <div className="channel-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/><circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div className="channel-text">
+          <div className="channel-label"><T es="Agenda" en="Schedule" /></div>
+          <div className="channel-value"><T es="Reservá tu llamada" en="Pick a time slot" /></div>
+        </div>
+        <span className="channel-arr">→</span>
+      </a>
+    </div>
+  );
+}
+
+function ContactForm() {
+  const { lang } = useLang();
+  const [done, setDone] = React.useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!e.currentTarget.reportValidity()) return;
+    const data = new FormData(e.currentTarget);
+    const lines = [];
+    for (const [k, v] of data.entries()) {
+      if (String(v).trim()) lines.push(`${k}: ${v}`);
+    }
+    const subject = encodeURIComponent(lang === "en" ? "Contact — SYS Digital" : "Contacto — SYS Digital");
+    const body = encodeURIComponent(lines.join("\n"));
+    window.location.href = `mailto:hola@sysdigital.com?subject=${subject}&body=${body}`;
+    setDone(true);
+  };
+
+  if (done) {
+    return (
+      <div className="contact-form-success">
+        <p className="contact-form-success-title">
+          <T es="¡Listo!" en="All set!" />
+        </p>
+        <p className="contact-form-success-text">
+          <T
+            es="Se abrió tu cliente de correo. Si no aparece, escribinos a hola@sysdigital.com o por WhatsApp."
+            en="Your mail app should open. If not, email hola@sysdigital.com or WhatsApp us."
+          />
+        </p>
+        <a href="https://wa.me/" target="_blank" rel="noreferrer" className="btn btn-white">
+          WhatsApp
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <form className="contact-form" onSubmit={handleSubmit} noValidate>
+      <h3 className="contact-form-title">
+        <T es="Tus datos" en="Your details" />
+      </h3>
+      <p className="contact-form-sub">
+        <T es="Completá los campos y te respondemos a la brevedad." en="Fill in the fields and we'll get back to you soon." />
+      </p>
+
+      <div className="contact-form-grid contact-form-grid--fields">
+        <label className="contact-field">
+          <span><T es="Nombre completo *" en="Full name *" /></span>
+          <input name="nombre" type="text" required placeholder={lang === "en" ? "Your name" : "Tu nombre"} />
+        </label>
+        <label className="contact-field">
+          <span>Email *</span>
+          <input name="email" type="email" required placeholder={lang === "en" ? "you@company.com" : "tu@empresa.com"} />
+        </label>
+        <label className="contact-field">
+          <span><T es="Nombre de la empresa" en="Company name" /></span>
+          <input name="empresa" type="text" placeholder={lang === "en" ? "Your company" : "Nombre de tu empresa"} />
+        </label>
+        <label className="contact-field">
+          <span><T es="Teléfono" en="Phone" /></span>
+          <input name="telefono" type="tel" placeholder="+54 11 1234 5678" />
+        </label>
+      </div>
+
+      <div className="contact-form-actions">
+        <button type="submit" className="btn btn-white contact-form-next">
+          <T es="Enviar" en="Send" />
+          <span className="arr">→</span>
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function ContactPageBody() {
+  const { lang } = useLang();
+  const c = CONTACT_PAGE[lang];
+  return (
+    <section className="contact-section page-contact-main">
+      <div className="container page-contact-shell">
+        <Reveal as="div" className="contact-card contact-card--page">
+          <div className="contact-card-deco" aria-hidden="true">
+            <div className="lg-mark"><Logo /></div>
+          </div>
+          <div className="contact-grid contact-grid--page">
+            <div className="contact-page-aside">
+              <div className="contact-tag">{c.tag}</div>
+              <h2 className="contact-title">
+                {lang === "en" ? (
+                  <>Let&apos;s start <em>building.</em></>
+                ) : (
+                  <>Empecemos a <em>construir.</em></>
+                )}
+              </h2>
+              <p className="contact-lead">{c.lead}</p>
+              <p className="contact-page-note">
+                <T
+                  es="Buenos Aires · Respuesta en menos de 24 hs hábiles"
+                  en="Buenos Aires · Reply within 24 business hours"
+                />
+              </p>
+              <ContactChannels />
+            </div>
+            <div className="contact-page-form">
+              <ContactForm />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function HomeContactCTA() {
+  return (
+    <section className="contact-section home-contact-cta">
       <div className="container">
         <Reveal as="div" className="contact-card">
           <div className="contact-card-deco" aria-hidden="true">
@@ -567,51 +755,22 @@ function Contact() {
                    en={<>A <em>30-min call</em> can change your process.</>} />
               </h2>
               <p className="contact-lead">
-                <T es="Reservá un horario en nuestro calendario o escribinos directo por WhatsApp. Te respondemos en menos de 24 hs hábiles."
-                   en="Grab a slot on our calendar or ping us on WhatsApp. We reply within 24 business hours." />
+                <T
+                  es="Completá el formulario en nuestra página de contacto o escribinos por WhatsApp. Te respondemos en menos de 24 hs hábiles."
+                  en="Fill out the form on our contact page or message us on WhatsApp. We reply within 24 business hours."
+                />
               </p>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <a className="btn btn-white" href="#agenda" target="_blank" rel="noreferrer">
-                  <T es="Agendar en Google Calendar" en="Book on Google Calendar" />
+              <div className="hero-ctas" style={{ marginTop: 0 }}>
+                <a className="btn btn-white" href={pageUrl("contacto.html")}>
+                  <T es="Ir a contacto" en="Go to contact" />
                   <span className="arr">→</span>
+                </a>
+                <a className="btn btn-outline-white" href="https://wa.me/" target="_blank" rel="noreferrer">
+                  WhatsApp
                 </a>
               </div>
             </div>
-
-            <div className="contact-channels">
-              <a className="channel" href="#agenda">
-                <div className="channel-icon">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/><circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg>
-                </div>
-                <div className="channel-text">
-                  <div className="channel-label"><T es="Agenda" en="Schedule" /></div>
-                  <div className="channel-value"><T es="Reservá tu llamada" en="Pick a time slot" /></div>
-                </div>
-                <span className="channel-arr">→</span>
-              </a>
-
-              <a className="channel" href="https://wa.me/" target="_blank" rel="noreferrer">
-                <div className="channel-icon channel-icon--wa">
-                  <WhatsAppIcon />
-                </div>
-                <div className="channel-text">
-                  <div className="channel-label">WhatsApp</div>
-                  <div className="channel-value"><T es="Escribinos ahora" en="Message us now" /></div>
-                </div>
-                <span className="channel-arr">→</span>
-              </a>
-
-              <a className="channel" href="mailto:hola@sysdigital.com">
-                <div className="channel-icon">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
-                </div>
-                <div className="channel-text">
-                  <div className="channel-label">Email</div>
-                  <div className="channel-value">hola@sysdigital.com</div>
-                </div>
-                <span className="channel-arr">→</span>
-              </a>
-            </div>
+            <ContactChannels />
           </div>
         </Reveal>
       </div>
@@ -628,7 +787,7 @@ function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <a className="nav-brand" href="#top">
+            <a className="nav-brand" href={pageUrl("index.html")}>
               <span className="lg" style={{ width: 36, height: 22, color: "#fff" }}><Logo /></span>
               <span className="nav-brand-name">Sys&nbsp;Digital<span className="dot" /></span>
             </a>
@@ -640,19 +799,21 @@ function Footer() {
           <div className="footer-col">
             <h4><T es="Servicios" en="Services" /></h4>
             <ul>
-              <li><a href="#services"><T es="Automatizaciones" en="Automation" /></a></li>
-              <li><a href="#services"><T es="Diseño & multimedia" en="Design & multimedia" /></a></li>
-              <li><a href="#services"><T es="Marketing digital" en="Digital marketing" /></a></li>
-              <li><a href="#services"><T es="Community" en="Community" /></a></li>
+              <li><a href={pageUrl("servicios/automatizacion.html")}><T es="Automatizaciones" en="Automation" /></a></li>
+              <li><a href={pageUrl("servicios/diseno.html")}><T es="Diseño & multimedia" en="Design & multimedia" /></a></li>
+              <li><a href={pageUrl("servicios/web.html")}><T es="Páginas web" en="Websites" /></a></li>
+              <li><a href={pageUrl("servicios/marketing.html")}><T es="Marketing digital" en="Digital marketing" /></a></li>
+              <li><a href={pageUrl("servicios/community.html")}><T es="Community" en="Community" /></a></li>
             </ul>
           </div>
           <div className="footer-col">
             <h4><T es="Compañía" en="Company" /></h4>
             <ul>
-              <li><a href="#work"><T es="Casos" en="Work" /></a></li>
-              <li><a href="#testimonials"><T es="Reseñas" en="Voices" /></a></li>
-              <li><a href="#faq">FAQ</a></li>
-              <li><a href="#contact"><T es="Contacto" en="Contact" /></a></li>
+              <li><a href={pageUrl("nosotros.html")}><T es="Nosotros" en="About" /></a></li>
+              <li><a href={pageUrl("carreras.html")}><T es="Carreras" en="Careers" /></a></li>
+              <li><a href={pageUrl("casos.html")}><T es="Casos" en="Work" /></a></li>
+              <li><a href={pageUrl("index.html#faq")}>FAQ</a></li>
+              <li><a href={pageUrl("contacto.html")}><T es="Contacto" en="Contact" /></a></li>
             </ul>
           </div>
           <div className="footer-col">
@@ -687,5 +848,7 @@ function WhatsAppFloat() {
 /* ----------------- Export ----------------- */
 
 Object.assign(window, {
-  Nav, Hero, Stats, Marquee, Services, Portfolio, Testimonials, FAQ, Contact, Footer, WhatsAppFloat,
+  Hero, HeroDecor, useHeroParallax, heroParallaxStyle,
+  Stats, Marquee, Services, TeamSection, CasesGridFeatured, CasesGridAll, Portfolio, Testimonials, FAQ,
+  HomeContactCTA, ContactPageBody, Footer, WhatsAppFloat,
 });
