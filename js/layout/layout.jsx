@@ -1,5 +1,5 @@
 /* =================================================================
-   layout.jsx — Nav, footer helpers, page shells
+   js/layout/layout.jsx — Nav, footer helpers, page shells
 ================================================================= */
 
 const { useState: _useState, useEffect: _useEffect, useRef: _useRef } = React;

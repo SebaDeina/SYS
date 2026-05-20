@@ -1,5 +1,5 @@
 /* =================================================================
-   sections.jsx — Nav, Hero, Stats, Marquee, Services, Portfolio,
+   js/sections/sections.jsx — Hero, Stats, Marquee, Services, Portfolio,
    Testimonials, FAQ, HomeContactCTA, ContactPageBody, Footer, WhatsApp floating
 ================================================================= */
 

@@ -1,5 +1,5 @@
 /* =================================================================
-   pages.jsx — páginas internas (cada una con identidad propia)
+   js/pages/pages.jsx — páginas internas (cada una con identidad propia)
 ================================================================= */
 
 function ServicePage({ slug }) {

@@ -1,5 +1,5 @@
 /* =================================================================
-   site-data.js — rutas, servicios, casos, carreras, nosotros
+   js/data/site-data.js — rutas, servicios, casos, carreras, nosotros
 ================================================================= */
 
 const HOW_WE_WORK = {

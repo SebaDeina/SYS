@@ -1,5 +1,5 @@
 /* =================================================================
-   app.jsx — root mount + routing por data-page
+   js/app.jsx — root mount + routing por data-page
 ================================================================= */
 
 function useScrollToHash() {

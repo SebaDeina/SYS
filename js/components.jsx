@@ -1,5 +1,5 @@
 /* =================================================================
-   components.jsx — utilities & primitives
+   js/components.jsx — utilities & primitives
    Exposes to window: Cursor, Reveal, Counter, Logo, useLang, T
 ================================================================= */
 
