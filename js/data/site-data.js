@@ -221,6 +221,93 @@ const CONTACT_PAGE = {
   },
 };
 
+const CONTACT_FORM = {
+  es: {
+    steps: [
+      { label: "Datos", title: "Tus datos", sub: "Para responderte y coordinar una llamada si hace falta." },
+      { label: "Proyecto", title: "Tu proyecto", sub: "Contanos qué servicio te interesa y qué necesitás resolver." },
+      { label: "Detalles", title: "Últimos detalles", sub: "Presupuesto, plazos y contexto extra para armar una propuesta a medida." },
+    ],
+    services: [
+      { value: "automatizacion", label: "Automatización & IA" },
+      { value: "diseno", label: "Diseño & multimedia" },
+      { value: "web", label: "Páginas web" },
+      { value: "marketing", label: "Marketing digital" },
+      { value: "community", label: "Community management" },
+      { value: "varios", label: "Varios servicios" },
+      { value: "otro", label: "Otro / no estoy seguro" },
+    ],
+    stages: [
+      { value: "idea", label: "Idea o proyecto por arrancar" },
+      { value: "activo", label: "Proyecto en marcha" },
+      { value: "rediseno", label: "Rediseño o mejora de algo existente" },
+      { value: "explorando", label: "Explorando opciones" },
+    ],
+    budgets: [
+      { value: "sin-definir", label: "Aún no lo definí" },
+      { value: "hasta-2k", label: "Hasta USD 2.000" },
+      { value: "2k-10k", label: "USD 2.000 – 10.000" },
+      { value: "10k-30k", label: "USD 10.000 – 30.000" },
+      { value: "30k-plus", label: "Más de USD 30.000" },
+    ],
+    timelines: [
+      { value: "urgente", label: "Lo antes posible" },
+      { value: "1-3m", label: "1 a 3 meses" },
+      { value: "3-6m", label: "3 a 6 meses" },
+      { value: "flexible", label: "Flexible / sin fecha fija" },
+    ],
+    sources: [
+      { value: "google", label: "Google / búsqueda" },
+      { value: "recomendacion", label: "Recomendación" },
+      { value: "redes", label: "Redes sociales" },
+      { value: "caso", label: "Vimos un caso de estudio" },
+      { value: "otro", label: "Otro" },
+    ],
+  },
+  en: {
+    steps: [
+      { label: "Details", title: "Your details", sub: "So we can reply and schedule a call if needed." },
+      { label: "Project", title: "Your project", sub: "Which service you need and what you're trying to solve." },
+      { label: "Extra", title: "Final details", sub: "Budget, timeline and context so we can tailor our response." },
+    ],
+    services: [
+      { value: "automatizacion", label: "Automation & AI" },
+      { value: "diseno", label: "Design & multimedia" },
+      { value: "web", label: "Websites" },
+      { value: "marketing", label: "Digital marketing" },
+      { value: "community", label: "Community management" },
+      { value: "varios", label: "Multiple services" },
+      { value: "otro", label: "Other / not sure yet" },
+    ],
+    stages: [
+      { value: "idea", label: "Idea or about to start" },
+      { value: "activo", label: "Project in progress" },
+      { value: "rediseno", label: "Redesign or improving existing work" },
+      { value: "explorando", label: "Exploring options" },
+    ],
+    budgets: [
+      { value: "sin-definir", label: "Not defined yet" },
+      { value: "hasta-2k", label: "Up to USD 2,000" },
+      { value: "2k-10k", label: "USD 2,000 – 10,000" },
+      { value: "10k-30k", label: "USD 10,000 – 30,000" },
+      { value: "30k-plus", label: "Over USD 30,000" },
+    ],
+    timelines: [
+      { value: "urgente", label: "As soon as possible" },
+      { value: "1-3m", label: "1 to 3 months" },
+      { value: "3-6m", label: "3 to 6 months" },
+      { value: "flexible", label: "Flexible / no fixed date" },
+    ],
+    sources: [
+      { value: "google", label: "Google / search" },
+      { value: "recomendacion", label: "Referral" },
+      { value: "redes", label: "Social media" },
+      { value: "caso", label: "Saw a case study" },
+      { value: "otro", label: "Other" },
+    ],
+  },
+};
+
 const TEAM_MEMBERS = [
   {
     slug: "sol-bogner",
@@ -555,6 +642,7 @@ Object.assign(window, {
   CASES_INDEX_CONTENT,
   CASE_STUDIES,
   CONTACT_PAGE,
+  CONTACT_FORM,
   TEAM_MEMBERS,
   ABOUT_CONTENT,
   CAREERS_CONTENT,

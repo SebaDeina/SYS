@@ -1,0 +1,8 @@
+{
+  "name": "sys-digital",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "resend": "^4.5.1"
+  }
+}

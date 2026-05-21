@@ -52,3 +52,21 @@ python3 -m http.server 8080
 ```
 
 Abrir `http://localhost:8080/index.html`.
+
+## Formulario de contacto (Resend)
+
+El envío no puede hacerse desde el navegador (la API key quedaría expuesta). Hay un endpoint serverless en `api/contact.js` para Vercel.
+
+### Configuración
+
+1. Instalar dependencias: `npm install`
+2. Copiar `.env.example` → `.env.local` y completar:
+   - `RESEND_API_KEY` — clave desde [Resend](https://resend.com/api-keys) (**no commitear**)
+   - `RESEND_FROM` — `onboarding@resend.dev` en pruebas; con dominio verificado usá `contacto@tudominio.com`
+   - `CONTACT_TO_EMAIL` — `sys.incorporate@gmail.com`
+3. Desarrollo local con API: `npx vercel dev` (no uses solo `python -m http.server` para probar el envío)
+4. En Vercel → **Settings → Environment Variables**, agregá las mismas variables y redeploy.
+
+### Seguridad
+
+Si la API key se compartió en un chat o repo, **revocala y creá una nueva** en el panel de Resend.

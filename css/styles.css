@@ -3300,7 +3300,21 @@ body.has-cookie-ui.has-cookie-preferences .wa-float {
   transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
 .contact-form-steps {
-  gap: 20px;
+  gap: 28px;
+}
+.contact-form-step-dot:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(100% + 4px);
+  top: 50%;
+  width: 20px;
+  height: 2px;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1px;
+}
+.contact-form-step-dot.is-done:not(:last-child)::after {
+  background: rgba(45, 212, 191, 0.45);
 }
 .contact-form-step-dot.is-active {
   background: var(--cyan-deep);
@@ -3402,13 +3416,24 @@ body.has-cookie-ui.has-cookie-preferences .wa-float {
   margin-top: 24px;
   flex-wrap: wrap;
 }
+.contact-form-back {
+  flex-shrink: 0;
+}
 .contact-form-next {
   width: 100%;
   justify-content: center;
+  margin-left: auto;
+}
+.contact-form-actions:has(.contact-form-back) .contact-form-next {
+  width: auto;
+  flex: 1;
+  min-width: 140px;
 }
 @media (min-width: 641px) {
   .contact-form-next {
     width: auto;
+    flex: 0 1 auto;
+    margin-left: auto;
   }
 }
 .contact-form-success {
@@ -3425,6 +3450,28 @@ body.has-cookie-ui.has-cookie-preferences .wa-float {
   color: rgba(255, 255, 255, 0.65);
   margin: 0 0 24px;
   line-height: 1.5;
+}
+.contact-form-error {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fecaca;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.contact-field-honey {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.contact-form-next:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .role-card {

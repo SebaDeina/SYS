@@ -586,19 +586,21 @@ function FAQ() {
 
 /* ----------------- CONTACT ----------------- */
 
-function ContactChannels({ compact }) {
+function ContactChannels({ compact, showWhatsApp = true }) {
   return (
     <div className={`contact-channels${compact ? " contact-channels--compact" : ""}`}>
-      <a className="channel" href="https://wa.me/" target="_blank" rel="noreferrer">
-        <div className="channel-icon channel-icon--wa">
-          <WhatsAppIcon />
-        </div>
-        <div className="channel-text">
-          <div className="channel-label">WhatsApp</div>
-          <div className="channel-value"><T es="Escribinos ahora" en="Message us now" /></div>
-        </div>
-        <span className="channel-arr">→</span>
-      </a>
+      {showWhatsApp && (
+        <a className="channel" href="https://wa.me/" target="_blank" rel="noreferrer">
+          <div className="channel-icon channel-icon--wa">
+            <WhatsAppIcon />
+          </div>
+          <div className="channel-text">
+            <div className="channel-label">WhatsApp</div>
+            <div className="channel-value"><T es="Escribinos ahora" en="Message us now" /></div>
+          </div>
+          <span className="channel-arr">→</span>
+        </a>
+      )}
       <a className="channel" href="mailto:hola@sysdigital.com">
         <div className="channel-icon">
           <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
@@ -625,20 +627,95 @@ function ContactChannels({ compact }) {
 
 function ContactForm() {
   const { lang } = useLang();
+  const c = CONTACT_FORM[lang];
+  const totalSteps = c.steps.length;
+  const [step, setStep] = React.useState(0);
   const [done, setDone] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const formRef = React.useRef(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!e.currentTarget.reportValidity()) return;
-    const data = new FormData(e.currentTarget);
-    const lines = [];
-    for (const [k, v] of data.entries()) {
-      if (String(v).trim()) lines.push(`${k}: ${v}`);
+  const validateStep = (index) => {
+    const panel = formRef.current?.querySelector(`[data-step-panel="${index}"]`);
+    if (!panel) return false;
+    const fields = panel.querySelectorAll("input, select, textarea");
+    let valid = true;
+    fields.forEach((field) => {
+      if (!field.checkValidity()) {
+        field.reportValidity();
+        valid = false;
+      }
+    });
+    return valid;
+  };
+
+  const goNext = () => {
+    if (validateStep(step)) setStep((s) => Math.min(s + 1, totalSteps - 1));
+  };
+
+  const goBack = () => setStep((s) => Math.max(s - 1, 0));
+
+  const fieldLabel = (form, name) => {
+    const el = form.elements.namedItem(name);
+    if (el && el.tagName === "SELECT") {
+      const opt = el.options[el.selectedIndex];
+      return opt?.text || "";
     }
-    const subject = encodeURIComponent(lang === "en" ? "Contact — SYS Digital" : "Contacto — SYS Digital");
-    const body = encodeURIComponent(lines.join("\n"));
-    window.location.href = `mailto:hola@sysdigital.com?subject=${subject}&body=${body}`;
-    setDone(true);
+    return String(new FormData(form).get(name) || "").trim();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    for (let i = 0; i < totalSteps; i++) {
+      if (!validateStep(i)) {
+        setStep(i);
+        return;
+      }
+    }
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      lang,
+      nombre: String(data.get("nombre") || "").trim(),
+      email: String(data.get("email") || "").trim(),
+      empresa: String(data.get("empresa") || "").trim(),
+      cargo: String(data.get("cargo") || "").trim(),
+      telefono: String(data.get("telefono") || "").trim(),
+      servicio: String(data.get("servicio") || "").trim(),
+      servicioLabel: fieldLabel(form, "servicio"),
+      etapa: String(data.get("etapa") || "").trim(),
+      etapaLabel: fieldLabel(form, "etapa"),
+      necesidad: String(data.get("necesidad") || "").trim(),
+      presupuesto: String(data.get("presupuesto") || "").trim(),
+      presupuestoLabel: fieldLabel(form, "presupuesto"),
+      plazo: String(data.get("plazo") || "").trim(),
+      plazoLabel: fieldLabel(form, "plazo"),
+      origen: String(data.get("origen") || "").trim(),
+      origenLabel: fieldLabel(form, "origen"),
+      sitio: String(data.get("sitio") || "").trim(),
+      notas: String(data.get("notas") || "").trim(),
+      _gotcha: String(data.get("_gotcha") || "").trim(),
+    };
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json.error || (lang === "en" ? "Could not send. Try again." : "No se pudo enviar. Intentá de nuevo."));
+      }
+      setDone(true);
+    } catch (err) {
+      setError(err.message || (lang === "en" ? "Something went wrong." : "Algo salió mal."));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (done) {
@@ -649,50 +726,177 @@ function ContactForm() {
         </p>
         <p className="contact-form-success-text">
           <T
-            es="Se abrió tu cliente de correo. Si no aparece, escribinos a hola@sysdigital.com o por WhatsApp."
-            en="Your mail app should open. If not, email hola@sysdigital.com or WhatsApp us."
+            es="Recibimos tu consulta. Te respondemos en menos de 24 hs hábiles."
+            en="We got your inquiry. We'll reply within 24 business hours."
           />
         </p>
-        <a href="https://wa.me/" target="_blank" rel="noreferrer" className="btn btn-white">
-          WhatsApp
+        <a href="mailto:sys.incorporate@gmail.com" className="btn btn-white">
+          sys.incorporate@gmail.com
         </a>
       </div>
     );
   }
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit} noValidate>
-      <h3 className="contact-form-title">
-        <T es="Tus datos" en="Your details" />
-      </h3>
-      <p className="contact-form-sub">
-        <T es="Completá los campos y te respondemos a la brevedad." en="Fill in the fields and we'll get back to you soon." />
-      </p>
-
-      <div className="contact-form-grid contact-form-grid--fields">
-        <label className="contact-field">
-          <span><T es="Nombre completo *" en="Full name *" /></span>
-          <input name="nombre" type="text" required placeholder={lang === "en" ? "Your name" : "Tu nombre"} />
-        </label>
-        <label className="contact-field">
-          <span>Email *</span>
-          <input name="email" type="email" required placeholder={lang === "en" ? "you@company.com" : "tu@empresa.com"} />
-        </label>
-        <label className="contact-field">
-          <span><T es="Nombre de la empresa" en="Company name" /></span>
-          <input name="empresa" type="text" placeholder={lang === "en" ? "Your company" : "Nombre de tu empresa"} />
-        </label>
-        <label className="contact-field">
-          <span><T es="Teléfono" en="Phone" /></span>
-          <input name="telefono" type="tel" placeholder="+54 11 1234 5678" />
-        </label>
+    <form className="contact-form" ref={formRef} onSubmit={handleSubmit} noValidate>
+      <label className="contact-field-honey" aria-hidden="true">
+        <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
+      </label>
+      <div className="contact-form-head">
+        <div className="contact-form-steps" aria-hidden="true">
+          {c.steps.map((s, i) => (
+            <div
+              key={s.label}
+              className={`contact-form-step-dot${i === step ? " is-active" : ""}${i < step ? " is-done" : ""}`}
+              title={s.label}
+            >
+              {i < step ? "✓" : i + 1}
+            </div>
+          ))}
+        </div>
+        <span className="contact-form-step-count">
+          {step + 1} / {totalSteps}
+        </span>
       </div>
 
+      <div className="contact-form-step-panel" data-step-panel="0" hidden={step !== 0}>
+        <h3 className="contact-form-title">{c.steps[0].title}</h3>
+        <p className="contact-form-sub">{c.steps[0].sub}</p>
+        <div className="contact-form-grid contact-form-grid--fields">
+          <label className="contact-field">
+            <span><T es="Nombre completo *" en="Full name *" /></span>
+            <input name="nombre" type="text" required autoComplete="name" placeholder={lang === "en" ? "Your name" : "Tu nombre"} />
+          </label>
+          <label className="contact-field">
+            <span>Email *</span>
+            <input name="email" type="email" required autoComplete="email" placeholder={lang === "en" ? "you@company.com" : "tu@empresa.com"} />
+          </label>
+          <label className="contact-field">
+            <span><T es="Empresa *" en="Company *" /></span>
+            <input name="empresa" type="text" required autoComplete="organization" placeholder={lang === "en" ? "Company name" : "Nombre de la empresa"} />
+          </label>
+          <label className="contact-field">
+            <span><T es="Cargo / rol" en="Role / title" /></span>
+            <input name="cargo" type="text" autoComplete="organization-title" placeholder={lang === "en" ? "e.g. Marketing lead" : "Ej. Responsable de marketing"} />
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="Teléfono / WhatsApp *" en="Phone / WhatsApp *" /></span>
+            <input name="telefono" type="tel" required autoComplete="tel" placeholder="+54 11 1234 5678" />
+          </label>
+        </div>
+      </div>
+
+      <div className="contact-form-step-panel" data-step-panel="1" hidden={step !== 1}>
+        <h3 className="contact-form-title">{c.steps[1].title}</h3>
+        <p className="contact-form-sub">{c.steps[1].sub}</p>
+        <div className="contact-form-grid">
+          <label className="contact-field contact-field--full">
+            <span><T es="Servicio de interés *" en="Service of interest *" /></span>
+            <select name="servicio" required defaultValue="">
+              <option value="" disabled>{lang === "en" ? "Select one" : "Elegí una opción"}</option>
+              {c.services.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="Etapa del proyecto *" en="Project stage *" /></span>
+            <select name="etapa" required defaultValue="">
+              <option value="" disabled>{lang === "en" ? "Select one" : "Elegí una opción"}</option>
+              {c.stages.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="¿Qué necesitás resolver? *" en="What do you need to solve? *" /></span>
+            <textarea
+              name="necesidad"
+              required
+              rows={5}
+              placeholder={
+                lang === "en"
+                  ? "Goals, pain points, tools you use, what success looks like…"
+                  : "Objetivos, problemas actuales, herramientas que usás, qué sería un éxito…"
+              }
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="contact-form-step-panel" data-step-panel="2" hidden={step !== 2}>
+        <h3 className="contact-form-title">{c.steps[2].title}</h3>
+        <p className="contact-form-sub">{c.steps[2].sub}</p>
+        <div className="contact-form-grid contact-form-grid--fields">
+          <label className="contact-field">
+            <span><T es="Presupuesto estimado *" en="Estimated budget *" /></span>
+            <select name="presupuesto" required defaultValue="">
+              <option value="" disabled>{lang === "en" ? "Select range" : "Elegí un rango"}</option>
+              {c.budgets.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="contact-field">
+            <span><T es="Plazo ideal *" en="Ideal timeline *" /></span>
+            <select name="plazo" required defaultValue="">
+              <option value="" disabled>{lang === "en" ? "Select one" : "Elegí una opción"}</option>
+              {c.timelines.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="¿Cómo nos conociste? *" en="How did you find us? *" /></span>
+            <select name="origen" required defaultValue="">
+              <option value="" disabled>{lang === "en" ? "Select one" : "Elegí una opción"}</option>
+              {c.sources.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="Sitio web o redes (si aplica)" en="Website or social (if any)" /></span>
+            <input name="sitio" type="url" placeholder="https://" />
+          </label>
+          <label className="contact-field contact-field--full">
+            <span><T es="Algo más que debamos saber" en="Anything else we should know" /></span>
+            <textarea
+              name="notas"
+              rows={3}
+              placeholder={lang === "en" ? "References, team size, integrations…" : "Referencias, tamaño del equipo, integraciones…"}
+            />
+          </label>
+        </div>
+      </div>
+
+      {error && (
+        <p className="contact-form-error" role="alert">{error}</p>
+      )}
+
       <div className="contact-form-actions">
-        <button type="submit" className="btn btn-white contact-form-next">
-          <T es="Enviar" en="Send" />
-          <span className="arr">→</span>
-        </button>
+        {step > 0 && (
+          <button type="button" className="btn btn-outline-white contact-form-back" onClick={goBack} disabled={submitting}>
+            <T es="Atrás" en="Back" />
+          </button>
+        )}
+        {step < totalSteps - 1 ? (
+          <button type="button" className="btn btn-white contact-form-next" onClick={goNext} disabled={submitting}>
+            <T es="Siguiente" en="Next" />
+            <span className="arr">→</span>
+          </button>
+        ) : (
+          <button type="submit" className="btn btn-white contact-form-next" disabled={submitting}>
+            {submitting ? (
+              <T es="Enviando…" en="Sending…" />
+            ) : (
+              <>
+                <T es="Enviar consulta" en="Send inquiry" />
+                <span className="arr">→</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
     </form>
   );
@@ -725,7 +929,7 @@ function ContactPageBody() {
                   en="Buenos Aires · Reply within 24 business hours"
                 />
               </p>
-              <ContactChannels />
+              <ContactChannels showWhatsApp={false} />
             </div>
             <div className="contact-page-form">
               <ContactForm />
@@ -756,8 +960,8 @@ function HomeContactCTA() {
               </h2>
               <p className="contact-lead">
                 <T
-                  es="Completá el formulario en nuestra página de contacto o escribinos por WhatsApp. Te respondemos en menos de 24 hs hábiles."
-                  en="Fill out the form on our contact page or message us on WhatsApp. We reply within 24 business hours."
+                  es="Completá el formulario en nuestra página de contacto. Te respondemos en menos de 24 hs hábiles."
+                  en="Fill out the form on our contact page. We reply within 24 business hours."
                 />
               </p>
               <div className="hero-ctas" style={{ marginTop: 0 }}>
