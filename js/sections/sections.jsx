@@ -825,9 +825,27 @@ function Footer() {
               <li><a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a></li>
             </ul>
           </div>
+          <div className="footer-col">
+            <h4><T es="Legal" en="Legal" /></h4>
+            <ul>
+              <li><a href={pageUrl("terminos.html")}><T es="Términos y condiciones" en="Terms & conditions" /></a></li>
+              <li><a href={pageUrl("terminos.html#cookies")}><T es="Política de cookies" en="Cookie policy" /></a></li>
+              <li>
+                <button type="button" className="footer-link-btn" onClick={() => openCookiePreferences()}>
+                  <T es="Preferencias de cookies" en="Cookie preferences" />
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Sys Digital</span>
+          <nav className="footer-bottom-links" aria-label="Legal">
+            <a href={pageUrl("terminos.html")}><T es="Términos" en="Terms" /></a>
+            <button type="button" className="footer-link-btn" onClick={() => openCookiePreferences()}>
+              <T es="Cookies" en="Cookies" />
+            </button>
+          </nav>
           <span><T es="Hecho con criterio en Buenos Aires" en="Built with care in Buenos Aires" /></span>
         </div>
       </div>

@@ -158,9 +158,205 @@ function Magnetic({ children, strength = 0.3 }) {
   return <span ref={ref} style={{ display: "inline-flex", transition: "transform 320ms cubic-bezier(0.2,0.8,0.2,1)" }}>{children}</span>;
 }
 
+/* ----------------- Cookie consent ----------------- */
+
+const COOKIE_CONSENT_KEY = "sys_cookie_consent_v1";
+const COOKIE_CONSENT_VERSION = 1;
+const COOKIE_PREFS_EVENT = "sys:open-cookie-preferences";
+
+function readCookieConsent() {
+  try {
+    const raw = localStorage.getItem(COOKIE_CONSENT_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || data.version !== COOKIE_CONSENT_VERSION) return null;
+    return data;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeCookieConsent(consent) {
+  const payload = {
+    version: COOKIE_CONSENT_VERSION,
+    necessary: true,
+    analytics: !!consent.analytics,
+    marketing: !!consent.marketing,
+    ts: Date.now(),
+  };
+  try {
+    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(payload));
+  } catch (e) {}
+  applyCookieScripts(payload);
+  return payload;
+}
+
+function applyCookieScripts(consent) {
+  if (!consent) return;
+  document.documentElement.dataset.cookieAnalytics = consent.analytics ? "1" : "0";
+  document.documentElement.dataset.cookieMarketing = consent.marketing ? "1" : "0";
+  /* Ejemplo: cargar Google Analytics solo con consentimiento
+  if (consent.analytics && !window.__sysAnalyticsLoaded) {
+    window.__sysAnalyticsLoaded = true;
+    // gtag('config', 'G-XXXXXXXX');
+  }
+  */
+}
+
+function openCookiePreferences() {
+  window.dispatchEvent(new CustomEvent(COOKIE_PREFS_EVENT));
+}
+
+function CookieConsent() {
+  const stored = readCookieConsent();
+  const [consent, setConsent] = useState(stored);
+  const [view, setView] = useState(stored ? null : "banner");
+  const [draft, setDraft] = useState({
+    analytics: stored?.analytics ?? false,
+    marketing: stored?.marketing ?? false,
+  });
+
+  useEffect(() => {
+    if (consent) applyCookieScripts(consent);
+  }, []);
+
+  useEffect(() => {
+    const onOpen = () => {
+      const current = readCookieConsent();
+      setDraft({
+        analytics: current?.analytics ?? false,
+        marketing: current?.marketing ?? false,
+      });
+      setView("preferences");
+    };
+    window.addEventListener(COOKIE_PREFS_EVENT, onOpen);
+    return () => window.removeEventListener(COOKIE_PREFS_EVENT, onOpen);
+  }, []);
+
+  useEffect(() => {
+    const on = view === "banner" || view === "preferences";
+    document.body.classList.toggle("has-cookie-ui", on);
+    document.body.classList.toggle("has-cookie-banner", view === "banner");
+    document.body.classList.toggle("has-cookie-preferences", view === "preferences");
+    return () => {
+      document.body.classList.remove("has-cookie-ui", "has-cookie-banner", "has-cookie-preferences");
+    };
+  }, [view]);
+
+  const persist = (next) => {
+    const saved = writeCookieConsent(next);
+    setConsent(saved);
+    setView(null);
+  };
+
+  const acceptAll = () => persist({ analytics: true, marketing: true });
+  const rejectOptional = () => persist({ analytics: false, marketing: false });
+  const savePreferences = () => persist(draft);
+
+  if (!view) return null;
+
+  const termsHref = `${pageUrl("terminos.html")}#cookies`;
+
+  if (view === "preferences") {
+    return (
+      <div className="cookie-overlay" role="dialog" aria-modal="true" aria-labelledby="cookie-prefs-title">
+        <div className="cookie-panel cookie-panel--prefs">
+          <h2 id="cookie-prefs-title" className="cookie-panel-title">
+            <T es="Preferencias de cookies" en="Cookie preferences" />
+          </h2>
+          <p className="cookie-panel-lead">
+            <T
+              es="Elegí qué categorías permitís. Las cookies necesarias no se pueden desactivar."
+              en="Choose which categories you allow. Necessary cookies cannot be disabled."
+            />
+          </p>
+          <ul className="cookie-pref-list">
+            <li className="cookie-pref-item is-locked">
+              <div className="cookie-pref-head">
+                <span className="cookie-pref-name"><T es="Necesarias" en="Necessary" /></span>
+                <span className="cookie-pref-badge"><T es="Siempre activas" en="Always on" /></span>
+              </div>
+              <p className="cookie-pref-desc">
+                <T es="Idioma, consentimiento y funcionamiento básico del sitio." en="Language, consent and core site functionality." />
+              </p>
+            </li>
+            <li className="cookie-pref-item">
+              <label className="cookie-pref-head">
+                <span className="cookie-pref-name"><T es="Analíticas" en="Analytics" /></span>
+                <input
+                  type="checkbox"
+                  checked={draft.analytics}
+                  onChange={(e) => setDraft((d) => ({ ...d, analytics: e.target.checked }))}
+                />
+              </label>
+              <p className="cookie-pref-desc">
+                <T es="Estadísticas de uso agregadas para mejorar el sitio." en="Aggregated usage stats to improve the site." />
+              </p>
+            </li>
+            <li className="cookie-pref-item">
+              <label className="cookie-pref-head">
+                <span className="cookie-pref-name"><T es="Marketing" en="Marketing" /></span>
+                <input
+                  type="checkbox"
+                  checked={draft.marketing}
+                  onChange={(e) => setDraft((d) => ({ ...d, marketing: e.target.checked }))}
+                />
+              </label>
+              <p className="cookie-pref-desc">
+                <T es="Medición de campañas y personalización en otros canales." en="Campaign measurement and personalization on other channels." />
+              </p>
+            </li>
+          </ul>
+          <div className="cookie-panel-actions">
+            <button type="button" className="btn btn-primary" onClick={savePreferences}>
+              <T es="Guardar preferencias" en="Save preferences" />
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => setView(consent ? null : "banner")}>
+              <T es="Cancelar" en="Cancel" />
+            </button>
+          </div>
+          <p className="cookie-panel-foot">
+            <a href={termsHref}><T es="Ver política de cookies" en="View cookie policy" /></a>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cookie-banner" role="dialog" aria-labelledby="cookie-banner-title">
+      <div className="cookie-banner-inner container">
+        <div className="cookie-banner-text">
+          <h2 id="cookie-banner-title" className="cookie-banner-title">
+            <T es="Usamos cookies" en="We use cookies" />
+          </h2>
+          <p className="cookie-banner-desc">
+            <T
+              es={<>Usamos cookies necesarias y, con tu permiso, analíticas y de marketing. Podés configurarlas o leer más en nuestros <a href={termsHref}>términos y cookies</a>.</>}
+              en={<>We use necessary cookies and, with your permission, analytics and marketing. Configure them or read more in our <a href={termsHref}>terms & cookies</a>.</>}
+            />
+          </p>
+        </div>
+        <div className="cookie-banner-actions">
+          <button type="button" className="btn btn-primary" onClick={acceptAll}>
+            <T es="Aceptar todas" en="Accept all" />
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={rejectOptional}>
+            <T es="Solo necesarias" en="Necessary only" />
+          </button>
+          <button type="button" className="btn btn-ghost cookie-btn-config" onClick={() => setView("preferences")}>
+            <T es="Configurar" en="Customize" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ----------------- Export to window ----------------- */
 
 Object.assign(window, {
   LangProvider, useLang, T, t,
   Cursor, Reveal, Counter, Logo, WhatsAppIcon, Magnetic,
+  CookieConsent, openCookiePreferences, readCookieConsent,
 });

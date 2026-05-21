@@ -62,26 +62,29 @@ function App() {
     case "contact":
       inner = <ContactPage />;
       break;
+    case "terms":
+      inner = <TermsPage />;
+      break;
     default:
       inner = <HomePage />;
   }
 
-  if (page === "home") {
-    return (
-      <LangProvider>
-        <Cursor />
-        <SiteNav />
-        <main>{inner}</main>
-        <Footer />
-        <WhatsAppFloat />
-      </LangProvider>
-    );
-  }
+  const shell = page === "home" ? (
+    <>
+      <SiteNav />
+      <main>{inner}</main>
+      <Footer />
+      <WhatsAppFloat />
+    </>
+  ) : (
+    <SiteShell>{inner}</SiteShell>
+  );
 
   return (
     <LangProvider>
       <Cursor />
-      <SiteShell>{inner}</SiteShell>
+      <CookieConsent />
+      {shell}
     </LangProvider>
   );
 }

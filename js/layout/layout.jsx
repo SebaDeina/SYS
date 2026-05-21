@@ -231,6 +231,33 @@ function Breadcrumbs({ items }) {
   );
 }
 
+/** Ícono Streamline sync — assets/icon-sync.svg */
+function TimelineSyncIcon({ className = "timeline-sync-icon" }) {
+  const stroke = {
+    stroke: "currentColor",
+    strokeWidth: 1.25,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    fill: "none",
+  };
+  return (
+    <svg className={className} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <g transform="scale(-1, 1) translate(-14, 0)">
+        <path d="M11 9L13 8.5L13.5 10.5" {...stroke} />
+        <path
+          d="M13 8.5C12.5558 9.75861 11.749 10.8576 10.6813 11.6584C9.61353 12.4592 8.33262 12.926 6.99999 13C5.7681 13.0002 4.566 12.6213 3.55697 11.9146C2.54794 11.2079 1.78088 10.2078 1.35999 9.05"
+          {...stroke}
+        />
+        <path d="M3 5L1 5.5L0.5 3.5" {...stroke} />
+        <path
+          d="M1 5.5C1.84 3.2 4.42 1 7 1C8.23789 1.00348 9.4444 1.38976 10.4541 2.10588C11.4639 2.822 12.2274 3.8329 12.64 5"
+          {...stroke}
+        />
+      </g>
+    </svg>
+  );
+}
+
 function TimelineLoopBanner({ steps, loopNote }) {
   const bannerRef = _useRef(null);
   const [inView, setInView] = _useState(false);
@@ -266,25 +293,7 @@ function TimelineLoopBanner({ steps, loopNote }) {
       className={`timeline-loop-banner${inView ? " is-animating" : ""}`}
     >
       <div className="timeline-loop-banner-icon" aria-hidden="true">
-        <svg className="timeline-loop-svg" viewBox="0 0 48 48" fill="none">
-          <circle className="timeline-loop-ring-outer" cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 4" />
-          <path
-            className="timeline-loop-arrow-head"
-            d="M24 9v7l4.5-3.5M24 39v-7l-4.5 3.5"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            className="timeline-loop-arc-path"
-            d="M33 17a11 11 0 1 1-9.5 10.5"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-          />
-        </svg>
+        <TimelineSyncIcon className="timeline-sync-icon timeline-loop-svg" />
       </div>
       <div className="timeline-loop-banner-text">
         <p className="timeline-loop-banner-title">
@@ -319,6 +328,7 @@ function HowWeWork() {
   const { lang } = useLang();
   const c = HOW_WE_WORK[lang];
   const sectionRef = _useRef(null);
+  const trackRef = _useRef(null);
   const stepRefs = _useRef([]);
   const [activeIndex, setActiveIndex] = _useState(0);
   const [lineProgress, setLineProgress] = _useState(0);
@@ -326,9 +336,33 @@ function HowWeWork() {
   _useEffect(() => {
     stepRefs.current = stepRefs.current.slice(0, c.steps.length);
     const section = sectionRef.current;
-    if (!section) return;
+    const track = trackRef.current;
+    if (!section || !track) return;
+
+    const measureRail = () => {
+      const firstStep = stepRefs.current[0];
+      const lastStep = stepRefs.current[c.steps.length - 1];
+      if (!firstStep || !lastStep) return;
+
+      const firstDot = firstStep.querySelector(".timeline-dot");
+      const lastDot = lastStep.querySelector(".timeline-dot");
+      if (!firstDot || !lastDot) return;
+
+      const trackRect = track.getBoundingClientRect();
+      const firstRect = firstDot.getBoundingClientRect();
+      const lastRect = lastDot.getBoundingClientRect();
+      const railTop = firstRect.top + firstRect.height / 2 - trackRect.top;
+      const railEnd = lastRect.top + lastRect.height / 2 - trackRect.top;
+      const railLeft = firstRect.left + firstRect.width / 2 - trackRect.left;
+
+      track.style.setProperty("--rail-top", `${railTop}px`);
+      track.style.setProperty("--rail-height", `${Math.max(0, railEnd - railTop)}px`);
+      track.style.setProperty("--rail-left", `${railLeft}px`);
+    };
 
     const update = () => {
+      measureRail();
+
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
       const sectionTop = rect.top + window.scrollY;
@@ -360,7 +394,7 @@ function HowWeWork() {
         <Reveal as="p" className="section-lead timeline-lead" delay={2}>{c.lead}</Reveal>
 
         <div className="timeline">
-          <div className="timeline-track">
+          <div className="timeline-track" ref={trackRef}>
             <div className="timeline-rail" aria-hidden="true">
               <div className="timeline-line" />
               <div className="timeline-line-fill" style={{ height: `${lineProgress}%` }} />
@@ -378,15 +412,7 @@ function HowWeWork() {
                   <div className="timeline-marker">
                     {isLast ? (
                       <span className="timeline-dot timeline-dot--loop" title={c.loopNote}>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path
-                            d="M12 5a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-3v3m0 14v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                          />
-                        </svg>
+                        <TimelineSyncIcon />
                       </span>
                     ) : (
                       <span className="timeline-dot" />

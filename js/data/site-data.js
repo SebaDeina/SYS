@@ -339,6 +339,201 @@ const OPEN_ROLES = [
   },
 ];
 
+const TERMS_LEGAL = {
+  es: {
+    tag: "Legal",
+    title: "Términos y condiciones",
+    lead: "Condiciones de uso de este sitio web y del contacto con Sys Digital. Te recomendamos leerlas antes de utilizar nuestros servicios.",
+    updated: "19 de mayo de 2026",
+    tocTitle: "Índice",
+    sections: [
+      {
+        id: "identificacion",
+        title: "1. Identificación",
+        paragraphs: [
+          "Este sitio web es operado por Sys Digital (en adelante, «Sys Digital», «nosotros» o «la Agencia»), agencia de marketing digital y automatizaciones con base en Buenos Aires, Argentina.",
+          "Podés contactarnos en hola@sysdigital.com para consultas sobre estos términos, privacidad o el tratamiento de cookies.",
+        ],
+      },
+      {
+        id: "aceptacion",
+        title: "2. Aceptación",
+        paragraphs: [
+          "Al acceder y utilizar este sitio, aceptás estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el sitio.",
+          "El uso del formulario de contacto, WhatsApp u otros canales implica que la información que enviás es veraz y que tenés autorización para compartirla.",
+        ],
+      },
+      {
+        id: "sitio",
+        title: "3. Uso del sitio",
+        paragraphs: [
+          "El contenido publicado (textos, imágenes, casos, marcas de terceros mostradas con fines ilustrativos) tiene fines informativos. No garantizamos que el sitio esté libre de interrupciones o errores técnicos.",
+          "Queda prohibido usar el sitio para fines ilegales, intentar acceder sin autorización a sistemas, extraer datos de forma masiva (scraping) o reproducir contenido sin permiso escrito, salvo uso personal y no comercial.",
+        ],
+      },
+      {
+        id: "servicios",
+        title: "4. Servicios y contratación",
+        paragraphs: [
+          "Los servicios de Sys Digital (diseño, desarrollo web, marketing, automatización, community, etc.) se contratan mediante propuesta o acuerdo comercial aparte. Lo publicado en el sitio no constituye oferta vinculante ni relación contractual hasta que exista confirmación expresa.",
+          "Plazos, entregables, precios y alcances se definen en cada proyecto. Los casos y métricas mostrados son referenciales y pueden variar según industria y contexto del cliente.",
+        ],
+      },
+      {
+        id: "propiedad",
+        title: "5. Propiedad intelectual",
+        paragraphs: [
+          "El diseño del sitio, textos originales, código y marca Sys Digital son propiedad de la Agencia o de sus licenciantes. Los logos y marcas de clientes o terceros pertenecen a sus respectivos titulares.",
+          "Salvo pacto en contrario, los entregables de un proyecto contratado se rigen por el acuerdo de cesión o licencia firmado con el cliente.",
+        ],
+      },
+      {
+        id: "responsabilidad",
+        title: "6. Limitación de responsabilidad",
+        paragraphs: [
+          "En la máxima medida permitida por la ley aplicable, Sys Digital no será responsable por daños indirectos, lucro cesante o pérdida de datos derivados del uso del sitio o de enlaces externos.",
+          "Nada en estos términos limita derechos irrenunciables del consumidor cuando corresponda según la normativa argentina.",
+        ],
+      },
+      {
+        id: "privacidad",
+        title: "7. Privacidad",
+        paragraphs: [
+          "Si nos contactás, tratamos los datos que nos enviás (nombre, email, empresa, teléfono, mensaje) para responder tu consulta y, si corresponde, preparar una propuesta comercial.",
+          "No vendemos datos personales. Podemos usar proveedores de hosting, email o analítica que actúan como encargados del tratamiento bajo obligaciones de confidencialidad.",
+          "Para ejercer acceso, rectificación o supresión de tus datos, escribinos a hola@sysdigital.com indicando tu solicitud.",
+        ],
+      },
+      {
+        id: "cookies",
+        title: "8. Cookies y tecnologías similares",
+        paragraphs: [
+          "Usamos cookies y almacenamiento local para que el sitio funcione correctamente, recordar tu idioma y —solo si lo aceptás— medir uso de forma agregada o personalizar contenido.",
+        ],
+        list: [
+          { name: "Necesarias", desc: "Esenciales para navegación, seguridad y preferencias básicas (por ejemplo, idioma y consentimiento de cookies). Siempre activas." },
+          { name: "Analíticas", desc: "Nos ayudan a entender cómo se usa el sitio (páginas visitadas, origen del tráfico). Datos agregados y anónimos cuando es posible." },
+          { name: "Marketing", desc: "Permiten medir campañas y, en su caso, mostrar contenido relevante en otros canales. Solo se activan con tu consentimiento." },
+        ],
+        afterList: [
+          "Podés cambiar tu decisión en cualquier momento desde «Preferencias de cookies» en el pie del sitio o borrando las cookies del navegador.",
+          "Más detalle en la configuración del banner al ingresar por primera vez.",
+        ],
+      },
+      {
+        id: "cambios",
+        title: "9. Modificaciones",
+        paragraphs: [
+          "Podemos actualizar estos términos y la política de cookies. Publicaremos la fecha de última actualización en esta página. El uso continuado del sitio tras cambios relevantes implica aceptación de la versión vigente.",
+        ],
+      },
+      {
+        id: "ley",
+        title: "10. Ley aplicable",
+        paragraphs: [
+          "Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia se someterá a los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires, salvo norma imperativa en contrario.",
+        ],
+      },
+    ],
+  },
+  en: {
+    tag: "Legal",
+    title: "Terms & conditions",
+    lead: "Terms of use for this website and for contacting Sys Digital. We recommend reading them before using our services.",
+    updated: "May 19, 2026",
+    tocTitle: "Contents",
+    sections: [
+      {
+        id: "identificacion",
+        title: "1. Identification",
+        paragraphs: [
+          "This website is operated by Sys Digital (\"Sys Digital\", \"we\" or \"the Agency\"), a digital marketing and automation agency based in Buenos Aires, Argentina.",
+          "You can reach us at hola@sysdigital.com for questions about these terms, privacy or cookies.",
+        ],
+      },
+      {
+        id: "aceptacion",
+        title: "2. Acceptance",
+        paragraphs: [
+          "By accessing and using this site you accept these Terms & Conditions. If you disagree, please do not use the site.",
+          "Using the contact form, WhatsApp or other channels means the information you send is accurate and that you are authorized to share it.",
+        ],
+      },
+      {
+        id: "sitio",
+        title: "3. Use of the site",
+        paragraphs: [
+          "Published content (copy, images, case studies, third-party marks shown for illustration) is informational. We do not guarantee the site will be uninterrupted or error-free.",
+          "You may not use the site for unlawful purposes, attempt unauthorized access, mass data extraction (scraping) or reproduce content without written permission, except personal non-commercial use.",
+        ],
+      },
+      {
+        id: "servicios",
+        title: "4. Services & engagement",
+        paragraphs: [
+          "Sys Digital services (design, web development, marketing, automation, community, etc.) are hired through a separate proposal or commercial agreement. Nothing on the site is a binding offer until expressly confirmed.",
+          "Timelines, deliverables, pricing and scope are defined per project. Cases and metrics shown are illustrative and vary by industry and client context.",
+        ],
+      },
+      {
+        id: "propiedad",
+        title: "5. Intellectual property",
+        paragraphs: [
+          "Site design, original copy, code and the Sys Digital brand belong to the Agency or its licensors. Client and third-party logos belong to their owners.",
+          "Unless otherwise agreed, project deliverables are governed by the assignment or license agreement signed with the client.",
+        ],
+      },
+      {
+        id: "responsabilidad",
+        title: "6. Limitation of liability",
+        paragraphs: [
+          "To the fullest extent permitted by applicable law, Sys Digital is not liable for indirect damages, lost profits or data loss arising from use of the site or external links.",
+          "Nothing here limits non-waivable consumer rights under Argentine law where applicable.",
+        ],
+      },
+      {
+        id: "privacidad",
+        title: "7. Privacy",
+        paragraphs: [
+          "If you contact us, we process the data you send (name, email, company, phone, message) to reply and, where relevant, prepare a proposal.",
+          "We do not sell personal data. We may use hosting, email or analytics providers acting as processors under confidentiality obligations.",
+          "To request access, correction or deletion, email hola@sysdigital.com with your request.",
+        ],
+      },
+      {
+        id: "cookies",
+        title: "8. Cookies & similar technologies",
+        paragraphs: [
+          "We use cookies and local storage so the site works, remembers your language and —only if you accept— measures usage in aggregate or personalizes content.",
+        ],
+        list: [
+          { name: "Necessary", desc: "Required for navigation, security and basic preferences (e.g. language and cookie consent). Always on." },
+          { name: "Analytics", desc: "Help us understand how the site is used (pages, traffic sources). Aggregated and anonymized when possible." },
+          { name: "Marketing", desc: "Measure campaigns and, where applicable, show relevant content on other channels. Only with your consent." },
+        ],
+        afterList: [
+          "You can change your choice anytime via \"Cookie preferences\" in the footer or by clearing browser cookies.",
+          "More detail is available in the banner settings on first visit.",
+        ],
+      },
+      {
+        id: "cambios",
+        title: "9. Changes",
+        paragraphs: [
+          "We may update these terms and the cookie policy. The last updated date is shown on this page. Continued use after material changes means acceptance of the current version.",
+        ],
+      },
+      {
+        id: "ley",
+        title: "10. Governing law",
+        paragraphs: [
+          "These terms are governed by the laws of Argentina. Disputes shall be submitted to the ordinary courts of the City of Buenos Aires unless mandatory rules provide otherwise.",
+        ],
+      },
+    ],
+  },
+};
+
 function getServiceBySlug(slug) {
   return SERVICE_PAGES.find((s) => s.slug === slug);
 }
@@ -364,6 +559,7 @@ Object.assign(window, {
   ABOUT_CONTENT,
   CAREERS_CONTENT,
   OPEN_ROLES,
+  TERMS_LEGAL,
   getServiceBySlug,
   getCaseBySlug,
   pageUrl,

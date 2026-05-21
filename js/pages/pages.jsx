@@ -194,6 +194,90 @@ function AboutPage() {
   );
 }
 
+function CareersHiringProcess({ steps }) {
+  const trackRef = React.useRef(null);
+  const targetProgress = React.useRef(0);
+  const smoothProgress = React.useRef(0);
+  const [progress, setProgress] = React.useState(0);
+  const rafRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const measure = () => {
+      const rect = track.getBoundingClientRect();
+      const vh = window.innerHeight;
+      targetProgress.current = Math.min(
+        1,
+        Math.max(0, (vh * 0.58 - rect.top) / Math.max(rect.height * 0.75, 1))
+      );
+    };
+
+    const tick = () => {
+      const prev = smoothProgress.current;
+      const next = prev + (targetProgress.current - prev) * 0.06;
+      const settled = Math.abs(targetProgress.current - next) < 0.002;
+      smoothProgress.current = settled ? targetProgress.current : next;
+      setProgress(smoothProgress.current);
+      if (!settled) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        rafRef.current = null;
+      }
+    };
+
+    const onScroll = () => {
+      measure();
+      if (!rafRef.current) rafRef.current = requestAnimationFrame(tick);
+    };
+
+    measure();
+    smoothProgress.current = targetProgress.current;
+    setProgress(targetProgress.current);
+    rafRef.current = requestAnimationFrame(tick);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [steps.length]);
+
+  const position = progress * Math.max(steps.length - 1, 1);
+
+  return (
+    <div className="careers-process-scroll">
+      <div className="careers-process-track" ref={trackRef}>
+        <div className="careers-process-line" aria-hidden="true">
+          <span className="careers-process-line-dash" />
+          <span
+            className="careers-process-line-fill"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
+        <ol className="careers-process-steps">
+          {steps.map((step, i) => {
+            const focus = Math.max(0, 1 - Math.abs(position - i) * 0.85);
+            const reach = Math.min(1, Math.max(0, position - i + 0.55));
+            return (
+              <li
+                key={i}
+                className="careers-process-step"
+                style={{ "--focus": focus, "--reach": reach }}
+              >
+                <span className="careers-process-marker">{String(i + 1).padStart(2, "0")}</span>
+                <p className="careers-process-text">{step}</p>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 function CareersPage() {
   const { lang } = useLang();
   const c = CAREERS_CONTENT[lang];
@@ -246,17 +330,10 @@ function CareersPage() {
 
       <section className="careers-steps">
         <div className="container">
-          <h2 className="careers-steps-title">
+          <Reveal as="h2" className="careers-steps-title">
             {lang === "en" ? "Hiring process" : "Proceso de selección"}
-          </h2>
-          <ol className="careers-steps-list">
-            {c.process.map((step, i) => (
-              <li key={i}>
-                <span className="careers-step-num">{String(i + 1).padStart(2, "0")}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
+          </Reveal>
+          <CareersHiringProcess steps={c.process} />
         </div>
       </section>
 
@@ -298,6 +375,87 @@ function ContactPage() {
   );
 }
 
+function TermsPage() {
+  const { lang } = useLang();
+  const c = TERMS_LEGAL[lang];
+
+  React.useEffect(() => {
+    const hash = window.location.hash?.slice(1);
+    if (!hash) return;
+    const scroll = () => {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    scroll();
+    requestAnimationFrame(scroll);
+    setTimeout(scroll, 200);
+  }, []);
+
+  return (
+    <div className="page-legal">
+      <PageHero
+        variant="default"
+        tag={c.tag}
+        title={c.title}
+        lead={c.lead}
+        breadcrumbs={
+          <Breadcrumbs items={[{ label: c.title }]} />
+        }
+      />
+      <section className="legal-section">
+        <div className="container legal-layout">
+          <aside className="legal-toc" aria-label={c.tocTitle}>
+            <p className="legal-toc-label">{c.tocTitle}</p>
+            <nav>
+              <ul>
+                {c.sections.map((sec) => (
+                  <li key={sec.id}>
+                    <a href={`#${sec.id}`}>{sec.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <p className="legal-updated">
+              <T es="Última actualización:" en="Last updated:" /> {c.updated}
+            </p>
+          </aside>
+          <div className="legal-prose">
+            {c.sections.map((sec) => (
+              <article key={sec.id} id={sec.id} className="legal-block">
+                <h2 className="legal-block-title">{sec.title}</h2>
+                {sec.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+                {sec.list && (
+                  <dl className="legal-cookie-list">
+                    {sec.list.map((item) => (
+                      <React.Fragment key={item.name}>
+                        <dt>{item.name}</dt>
+                        <dd>{item.desc}</dd>
+                      </React.Fragment>
+                    ))}
+                  </dl>
+                )}
+                {sec.afterList?.map((p, i) => (
+                  <p key={`after-${i}`}>{p}</p>
+                ))}
+              </article>
+            ))}
+            <div className="legal-actions">
+              <button type="button" className="btn btn-primary" onClick={() => openCookiePreferences()}>
+                <T es="Gestionar cookies" en="Manage cookies" />
+              </button>
+              <a href={pageUrl("contacto.html")} className="btn btn-ghost">
+                <T es="Contacto" en="Contact" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 Object.assign(window, {
-  ServicePage, CasesIndexPage, CasePage, AboutPage, CareersPage, ContactPage,
+  ServicePage, CasesIndexPage, CasePage, AboutPage, CareersPage, ContactPage, TermsPage,
 });
